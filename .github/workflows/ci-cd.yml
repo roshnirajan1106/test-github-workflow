@@ -3,7 +3,7 @@ name: CI/CD pipeline with jfrog artifactory
 on:
   push:
     branches: [main,develop]
-  pull_request: :
+  pull_request:
     branches: [main]
 
 env:
