@@ -7,7 +7,7 @@ https:///artifactory/api/docker/demo-docker
 #to read
 1. read about the settings.xml . check how the dependecies are going to virtual , how cached in local etc. how is the settings.xml configured with these
 2. read about shell scripting.
-3. Read about docker buildx
+3. Read about docker buildx.
 
 #learning
 1. mkdir -p = means to create a complex directory structure..
