@@ -1,0 +1,43 @@
+<!-- .github/maven-settings.xml -->
+<settings>
+    <servers>
+        <server>
+            <id>artifactory</id>
+            <username>${ARTIFACTORY_USERNAME}</username>
+            <password>${ARTIFACTORY_PASSWORD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>artifactory</id>
+            <repositories>
+                <repository>
+                    <id>central</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO}</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+
+            <distributionManagement>
+                <repository>
+                    <id>artifactory</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>artifactory</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO}</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>artifactory</activeProfile>
+    </activeProfiles>
+</settings>

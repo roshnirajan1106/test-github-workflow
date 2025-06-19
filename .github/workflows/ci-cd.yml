@@ -1,0 +1,81 @@
+name: CI/CD pipeline with jfrog artifactory
+
+on:
+  push:
+    branches: [main,develop]
+  pull_request: :
+    branches: [main]
+
+env:
+  JAVA_VERSION: '17'
+  DOCKER_REGISTRY: https://trialwxfvn8.jfrog.io
+  DOCKER_REPO: demo-docker-local
+  MAVEN_LOCAL_REPO: demo-libs-snapshot-local
+  MAVEN_VIRTUAL_REPO: demo-libs-snapshot
+
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'temurin'
+
+    - name: Setup JFrog CLI
+      uses: jfrog/setup-jfrog-cli@v3
+      env:
+        JF_URL: ${{ secrets.JF_URL }}           # https://your-company.jfrog.io
+        JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+
+    - name : Set up maven
+      uses: stCarolas/setup-maven@v5
+      with:
+        maven-version: '3.9.6'
+
+    - name: Install envsubst
+      run: sudo apt-get update && sudo apt-get install -y gettext-base
+
+    - name: Configure maven setting
+      run: |
+        mkdir -p ~/.m2
+        envsubst < .github/maven-settings.xml > ~/.m2/settings.xml
+
+    - name: Maven build and test
+      run: |
+        mvn clean package -B
+        echo "BUILD_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+    # publish it to jfrog
+    - name: Publish maven artifact
+      run: |
+        jf rt upload "target/*.jar" ${{env.MAVEN_LOCAL_REPO}}/com/demo/rosh/${{env.BUILD_VERSION}}/ --build-name=github-actions  --build-number=${{github.run_number}}
+
+     # Set up Docker Buildx (for advanced features)
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to Jfrog docker registry
+      run: |
+        echo ${{secrets.ARTIFACTORY_PASSWORD}} | docker login ${{env.DOCKER_REGISTRY}} -u ${{secrets.ARTIFACTORY_USERNAME}} --password-stdin
+
+    - name: Build docker image
+      run: |
+        docker build \
+        --build-arg BUILD_VERSION=${{ env.BUILD_VERSION }} \
+          --tag ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/roshApp:${{ env.BUILD_VERSION }} \
+          --tag ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/roshApp:latest \
+          .
+
+    - name: Push docker image
+      run: |
+        docker push ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/roshApp:${{ env.BUILD_VERSION }} \
+        docker push ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REPO }}/roshApp:latest
+
+
+
