@@ -7,12 +7,12 @@ LABEL version=$BUILD_VERSION
 # Create app directory
 WORKDIR /app
 
-# Copy the JAR file
 COPY target/*.jar app.jar
 
-# Create non-root user
-RUN addgroup -S appgroup && adduser -S -G appuser appgroup
+RUN addgroup -S appgroup && adduser -S -G appgroup appuser
+
 RUN chown -R appuser:appgroup /app
+
 USER appuser
 
 # Expose port
