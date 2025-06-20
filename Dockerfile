@@ -1,6 +1,5 @@
 # Dockerfile
-FROM openjdk:17-jre-slim
-
+FROM eclipse-temurin:17-jre-alpine
 # Build argument for version
 ARG BUILD_VERSION=unknown
 LABEL version=$BUILD_VERSION
