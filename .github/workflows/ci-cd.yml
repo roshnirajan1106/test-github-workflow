@@ -78,7 +78,7 @@ jobs:
 
     - name: Push docker image
       run: |
-        docker push ${{ env.REGISTRY_HOSTNAME }}/${{ env.DOCKER_REPO }}/roshapp:${{ env.BUILD_VERSION }} \
+        docker push ${{ env.REGISTRY_HOSTNAME }}/${{ env.DOCKER_REPO }}/roshapp:${{ env.BUILD_VERSION }}
         docker push ${{ env.REGISTRY_HOSTNAME }}/${{ env.DOCKER_REPO }}/roshapp:latest
 
 
