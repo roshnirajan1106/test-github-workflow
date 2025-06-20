@@ -11,7 +11,7 @@ WORKDIR /app
 COPY target/*.jar app.jar
 
 # Create non-root user
-RUN addgroup --system appgroup && adduser --system --group appuser appgroup
+RUN addgroup -S appgroup && adduser -S -G appuser appgroup
 RUN chown -R appuser:appgroup /app
 USER appuser
 
