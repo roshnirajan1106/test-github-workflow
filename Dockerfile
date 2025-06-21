@@ -1,10 +1,8 @@
 # Dockerfile
 FROM eclipse-temurin:17-jre-alpine
-# Build argument for version
 ARG BUILD_VERSION=unknown
 LABEL version=$BUILD_VERSION
 
-# Create app directory
 WORKDIR /app
 
 COPY target/*.jar app.jar
@@ -15,7 +13,6 @@ RUN chown -R appuser:appgroup /app
 
 USER appuser
 
-# Expose port
 EXPOSE 8080
 
 # Health check

@@ -40,3 +40,61 @@ Run 3: Added lombok + validation deps
 ├── Restore Keys: Gets previous cache (98 deps)
 ├── Downloads: Only lombok + validation (2 deps) - 45 seconds
 └── Cache Key: ubuntu-maven-hash456
+
+
+# GitHub Actions Cache Flow
+
+## First Run (No Cache)
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│ Fresh Runner    │    │ GitHub Cache     │    │ Maven Central/JFrog │
+│ ~/.m2/repo: ❌  │    │ Key abc123: ❌   │    │ Dependencies: ✅    │
+└─────────────────┘    └──────────────────┘    └─────────────────────┘
+        │                       │                         │
+        │ 1. Check cache        │                         │
+        │──────────────────────>│                         │
+        │ 2. No cache found     │                         │
+        │<──────────────────────│                         │
+        │                       │                         │
+        │ 3. mvn clean package  │                         │
+        │ 4. Download deps      │                         │
+        │────────────────────────────────────────────────>│
+        │ 5. Store in ~/.m2/repo│                         │
+        │<────────────────────────────────────────────────│
+        │                       │                         │
+        │ 6. Job complete       │                         │
+        │ 7. Upload cache       │                         │
+        │──────────────────────>│                         │
+        │ 8. Save as key abc123 │                         │
+        │                       │                         │
+     DESTROYED                PERSISTS                   │
+```
+
+## Second Run (Cache Hit)
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
+│ Fresh Runner    │    │ GitHub Cache     │    │ Maven Central/JFrog │
+│ ~/.m2/repo: ❌  │    │ Key abc123: ✅   │    │ Dependencies: ✅    │
+└─────────────────┘    └──────────────────┘    └─────────────────────┘
+        │                       │                         │
+        │ 1. Check cache        │                         │
+        │──────────────────────>│                         │
+        │ 2. Cache found!       │                         │
+        │ 3. Download & extract │                         │
+        │<──────────────────────│                         │
+        │                       │                         │
+        │ 4. mvn clean package  │                         │
+        │ 5. Use cached deps    │                         │
+        │ (No downloads needed) │                     ❌ No network calls
+        │                       │                         │
+        │ 6. Job complete       │                         │
+        │ 7. No cache changes   │                         │
+        │                       │                         │
+     DESTROYED                PERSISTS                   │
+```
+
+## Cache Storage Location
+- **NOT on runner**: GitHub's distributed cache infrastructure
+- **Accessible across**: All workflow runs in the repository
+- **Retention**: 7 days unused or 10GB limit
+- **Speed**: Much faster than downloading from external repos

@@ -50,6 +50,11 @@ jobs:
         mkdir -p ~/.m2
         envsubst < .github/maven-settings.xml > ~/.m2/settings.xml
 
+    - name: Cache Maven dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+
     - name: Maven build and test
       run: |
         mvn clean package -B
