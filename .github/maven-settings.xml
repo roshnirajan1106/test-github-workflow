@@ -1,0 +1,57 @@
+<!-- .github/maven-settings.xml -->
+<settings>
+    <servers>
+        <server>
+            <id>release</id>
+            <username>${ARTIFACTORY_USERNAME}</username>
+            <password>${ARTIFACTORY_PASSWORD}</password>
+        </server>
+        <server>
+            <id>snapshot</id>
+            <username>${ARTIFACTORY_USERNAME}</username>
+            <password>${ARTIFACTORY_PASSWORD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>artifactory</id>
+            <repositories>
+                <repository>
+                    <id>central-snapshot</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO_SNAPSHOT}</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>central-release</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO_RELEASE}</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+
+            <distributionManagement>
+                <repository>
+                    <id>release</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO_RELEASE}</url>
+                </repository>
+                <snapshotRepository>
+                    <id>snapshot</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO_SNAPSHOT}</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>artifactory</activeProfile>
+    </activeProfiles>
+</settings>
