@@ -2,7 +2,12 @@
 <settings>
     <servers>
         <server>
-            <id>artifactory</id>
+            <id>release</id>
+            <username>${ARTIFACTORY_USERNAME}</username>
+            <password>${ARTIFACTORY_PASSWORD}</password>
+        </server>
+        <server>
+            <id>snapshot</id>
             <username>${ARTIFACTORY_USERNAME}</username>
             <password>${ARTIFACTORY_PASSWORD}</password>
         </server>
@@ -13,10 +18,20 @@
             <id>artifactory</id>
             <repositories>
                 <repository>
-                    <id>central</id>
-                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO}</url>
+                    <id>central-snapshot</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO_SNAPSHOT}</url>
                     <snapshots>
                         <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>central-release</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_VIRTUAL_REPO_RELEASE}</url>
+                    <snapshots>
+                        <enabled>false</enabled>
                     </snapshots>
                     <releases>
                         <enabled>true</enabled>
@@ -26,17 +41,16 @@
 
             <distributionManagement>
                 <repository>
-                    <id>artifactory</id>
-                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO}</url>
+                    <id>release</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO_RELEASE}</url>
                 </repository>
                 <snapshotRepository>
-                    <id>artifactory</id>
-                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO}</url>
+                    <id>snapshot</id>
+                    <url>${JF_URL}/artifactory/${MAVEN_LOCAL_REPO_SNAPSHOT}</url>
                 </snapshotRepository>
             </distributionManagement>
         </profile>
     </profiles>
-
     <activeProfiles>
         <activeProfile>artifactory</activeProfile>
     </activeProfiles>

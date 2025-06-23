@@ -11,9 +11,12 @@ env:
   DOCKER_REGISTRY: https://trialwxfvn8.jfrog.io
   REGISTRY_HOSTNAME: trialwxfvn8.jfrog.io
   DOCKER_REPO: demo-docker-local
-  MAVEN_LOCAL_REPO: demo-libs-snapshot-local
-  MAVEN_VIRTUAL_REPO: demo-libs-snapshot
-
+  MAVEN_LOCAL_REPO_SNAPSHOT: demo-libs-snapshot-local
+  MAVEN_LOCAL_REPO_RELEASE: demo-libs-release-local
+  MAVEN_VIRTUAL_REPO_SNAPSHOT: demo-libs-snapshot
+  MAVEN_VIRTUAL_REPO_RELEASE: demo-libs-release
+  JF_URL: ${{ secrets.JF_URL }}
+  JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
 jobs:
   build-and-deploy:
@@ -31,8 +34,8 @@ jobs:
     - name: Setup JFrog CLI
       uses: jfrog/setup-jfrog-cli@v3
       env:
-        JF_URL: ${{ secrets.JF_URL }}           # https://your-company.jfrog.io
-        JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+        JF_URL: ${{ env.JF_URL }}           # https://your-company.jfrog.io
+        JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
 
     - name: JFrog Ping Test
       run: jf rt ping
@@ -63,7 +66,7 @@ jobs:
     # publish it to jfrog
     - name: Publish maven artifact
       run: |
-        jf rt upload "target/*.jar" ${{env.MAVEN_LOCAL_REPO}}/com/demo/rosh/${{env.BUILD_VERSION}}/ --build-name=github-actions  --build-number=${{github.run_number}}
+        jf rt upload "target/*.jar" ${{env.MAVEN_LOCAL_REPO_SNAPSHOT}}/com/demo/rosh/${{env.BUILD_VERSION}}/ --build-name=github-actions  --build-number=${{github.run_number}}
 
      # Set up Docker Buildx (for advanced features)
     - name: Set up Docker Buildx
